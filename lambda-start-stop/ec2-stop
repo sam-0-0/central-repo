@@ -1,0 +1,21 @@
+import json
+import boto3
+
+ec2 = boto3.resource('ec2', region_name='ap-south-1')
+
+def lambda_handler(event, context):
+#Taking in all the instance in the region mentioned
+     for instance in ec2.instances.all():
+
+        has_tag = False
+        for tag in instance.tags:
+            if tag['Key'] == 'KeepOnAlways' and tag['Value'] == 'True':
+                has_tag = True
+                break
+
+        if has_tag:
+            print("Instance ID is in running state:- "+instance.id)
+        else:
+            instance.stop()
+            print("Instance ID is stopped:- "+instance.id)
+     return "success"
